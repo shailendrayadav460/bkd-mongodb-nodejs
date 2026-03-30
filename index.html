@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend Explained — SumitSir Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --card: #16161f;
+  --border: #2a2a3a;
+  --accent: #7c6af7;
+  --accent2: #f7c26a;
+  --accent3: #6af7b8;
+  --text: #e8e8f0;
+  --muted: #8888aa;
+  --code-bg: #0d0d15;
+  --green: #4af786;
+  --red: #f76a6a;
+  --blue: #6ab4f7;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 18px;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--accent2); }
+nav { display: flex; gap: 28px; }
+nav a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--muted);
+  text-decoration: none; letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+nav a:hover { color: var(--accent2); }
+
+/* HERO */
+.hero {
+  padding: 90px 40px 70px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse at center, rgba(124,106,247,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.badge {
+  display: inline-block;
+  background: rgba(124,106,247,0.15);
+  border: 1px solid rgba(124,106,247,0.4);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; padding: 4px 14px;
+  border-radius: 20px; letter-spacing: 1px;
+  margin-bottom: 22px;
+  animation: fadeSlideDown 0.6s ease both;
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(38px, 6vw, 68px);
+  font-weight: 800; line-height: 1.05;
+  letter-spacing: -2px;
+  animation: fadeSlideDown 0.7s ease both 0.1s;
+}
+h1 em { color: var(--accent2); font-style: normal; }
+.hero-sub {
+  color: var(--muted); font-size: 17px;
+  max-width: 580px; margin: 18px auto 0;
+  animation: fadeSlideDown 0.7s ease both 0.2s;
+}
+.stack-pills {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-top: 30px;
+  animation: fadeSlideDown 0.7s ease both 0.3s;
+}
+.pill {
+  background: var(--card);
+  border: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; padding: 5px 14px;
+  border-radius: 6px; color: var(--text);
+}
+.pill.highlight { border-color: var(--accent); color: var(--accent); }
+.pill.y { border-color: var(--accent2); color: var(--accent2); }
+.pill.g { border-color: var(--accent3); color: var(--accent3); }
+
+/* MAIN */
+main { max-width: 960px; margin: 0 auto; padding: 0 40px 100px; }
+
+/* SECTION */
+section { margin-bottom: 70px; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--accent);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px; font-weight: 700;
+  letter-spacing: -0.8px; margin-bottom: 20px;
+}
+h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--accent2);
+  margin: 28px 0 10px;
+}
+p { color: var(--muted); margin-bottom: 14px; }
+p strong { color: var(--text); font-weight: 500; }
+
+/* CARDS */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 24px;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0; transition: opacity 0.2s;
+}
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card:hover::before { opacity: 1; }
+.card-icon { font-size: 24px; margin-bottom: 12px; }
+.card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--text); margin-bottom: 8px;
+}
+.card p { font-size: 13.5px; margin: 0; }
+
+/* CODE BLOCK */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+  margin: 16px 0;
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
+.code-dots { display: flex; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.r { background: #f76a6a; }
+.dot.y { background: var(--accent2); }
+.dot.g { background: var(--green); }
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 0.5px;
+}
+pre {
+  padding: 18px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 1.7;
+  overflow-x: auto; color: #cdd6f4;
+}
+.kw { color: #cba6f7; }
+.str { color: #a6e3a1; }
+.fn { color: #89b4fa; }
+.cm { color: #585b70; font-style: italic; }
+.var { color: #f5c2e7; }
+.num { color: #fab387; }
+.obj { color: #f9e2af; }
+
+/* STEP LIST */
+.steps { counter-reset: step; display: flex; flex-direction: column; gap: 0; }
+.step {
+  display: flex; gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.step:last-child { border-bottom: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  background: rgba(124,106,247,0.15);
+  border: 1px solid rgba(124,106,247,0.3);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.step-content h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--text); margin-bottom: 6px;
+}
+.step-content p { font-size: 13.5px; margin: 0 0 8px; }
+
+/* FLOW DIAGRAM */
+.flow {
+  display: flex; align-items: center;
+  gap: 0; flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  margin: 20px 0; overflow-x: auto;
+}
+.flow-node {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 16px;
+  text-align: center; min-width: 90px;
+  transition: border-color 0.2s;
+}
+.flow-node:hover { border-color: var(--accent); }
+.flow-node .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.flow-node span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--muted);
+}
+.flow-arrow {
+  font-size: 18px; color: var(--accent);
+  padding: 0 8px; flex-shrink: 0;
+}
+
+/* TABLE */
+.dep-table {
+  width: 100%; border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 13.5px;
+}
+.dep-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 1px;
+  color: var(--muted); text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--code-bg);
+}
+.dep-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+  vertical-align: top;
+}
+.dep-table tr:hover td { background: rgba(124,106,247,0.05); }
+.dep-name {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent2); font-size: 13px;
+}
+.dep-version {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--green); font-size: 12px;
+}
+.dep-desc { color: var(--muted); }
+
+/* FOLDER TREE */
+.tree {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; line-height: 2;
+}
+.tree .folder { color: var(--accent2); }
+.tree .file { color: var(--text); }
+.tree .note { color: var(--muted); font-size: 11px; margin-left: 8px; }
+.tree .line { color: var(--border); }
+
+/* SUMMARY CARD */
+.summary-box {
+  background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(106,247,184,0.08));
+  border: 1px solid rgba(124,106,247,0.3);
+  border-radius: 16px; padding: 36px;
+  margin-top: 30px;
+}
+.summary-box h2 { color: var(--accent); margin-bottom: 20px; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.summary-item {
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px; padding: 16px;
+  border-left: 3px solid var(--accent);
+}
+.summary-item.y { border-color: var(--accent2); }
+.summary-item.g { border-color: var(--accent3); }
+.summary-item.r { border-color: var(--red); }
+.summary-item h5 {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--text); margin-bottom: 6px;
+}
+.summary-item p { font-size: 13px; margin: 0; }
+
+/* CMD BOX */
+.cmd {
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px; padding: 14px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--green);
+  margin: 10px 0;
+  display: flex; align-items: center; gap: 10px;
+}
+.cmd::before { content: '$'; color: var(--muted); }
+
+/* CALLOUT */
+.callout {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: rgba(247,194,106,0.08);
+  border: 1px solid rgba(247,194,106,0.25);
+  border-radius: 10px; padding: 16px;
+  margin: 16px 0; color: var(--muted); font-size: 13.5px;
+}
+.callout .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.callout.blue {
+  background: rgba(106,180,247,0.08);
+  border-color: rgba(106,180,247,0.25);
+}
+.callout.green {
+  background: rgba(106,247,184,0.08);
+  border-color: rgba(106,247,184,0.25);
+}
+
+/* ANIMATIONS */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 40px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  header { padding: 14px 20px; }
+  nav { display: none; }
+  .hero, main { padding-left: 20px; padding-right: 20px; }
+  h1 { font-size: 36px; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .flow { gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Sumit<span>Sir</span>.dev</div>
+  <nav>
+    <a href="#what-is-backend">Backend?</a>
+    <a href="#stack">Stack</a>
+    <a href="#folder">Structure</a>
+    <a href="#flow">Flow</a>
+    <a href="#setup">Setup</a>
+    <a href="#summary">Summary</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">📖 REVISION GUIDE · BACKEND SERIES</div>
+  <h1>Your <em>Backend</em><br>Explained Clearly</h1>
+  <p class="hero-sub">A complete breakdown of your Node.js + Express + MongoDB backend — what each tool does, why it exists, and how everything connects.</p>
+  <div class="stack-pills">
+    <span class="pill highlight">Node.js</span>
+    <span class="pill highlight">Express v5</span>
+    <span class="pill y">MongoDB Atlas</span>
+    <span class="pill y">Mongoose</span>
+    <span class="pill g">Multer</span>
+    <span class="pill g">CORS</span>
+    <span class="pill">dotenv</span>
+    <span class="pill">nodemon</span>
+  </div>
+</div>
+
+<main>
+
+<!-- ─── WHAT IS BACKEND ─── -->
+<section id="what-is-backend">
+  <div class="section-label">// 01 — FOUNDATION</div>
+  <h2>What is a Backend?</h2>
+  <p>Think of any website as a <strong>restaurant</strong>. The frontend (what the user sees) is the dining area — the menus, tables, and ambiance. The <strong>backend is the kitchen</strong> — where food is actually prepared, stored, and served. Users never see the kitchen, but everything they eat comes from it.</p>
+  <p>Your backend does three core jobs:</p>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h4>Receive Requests</h4>
+      <p>When a user clicks "Submit" on a form, the frontend sends an HTTP request to your backend server.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h4>Process Logic</h4>
+      <p>The backend runs your business logic — validating data, calling the database, or processing files.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📤</div>
+      <h4>Send Response</h4>
+      <p>After processing, it sends a response back to the frontend — usually JSON data with a status code.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHAT IS NODE.JS ─── -->
+<section id="nodejs">
+  <div class="section-label">// 02 — RUNTIME</div>
+  <h2>Node.js — The Engine</h2>
+  <p>JavaScript was originally built to run only inside browsers. <strong>Node.js took the Chrome V8 engine and let JS run on your computer</strong> (or server) — outside the browser entirely.</p>
+  <div class="callout blue">
+    <span class="icon">💡</span>
+    <div>Without Node.js, you'd have to use PHP, Python, or Java to build backends. Node.js means you can use the same language — JavaScript — for both frontend and backend.</div>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>Non-Blocking I/O</h4>
+      <p>Node handles many requests simultaneously without waiting — like a waiter who takes multiple orders without standing still.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <h4>npm Ecosystem</h4>
+      <p>Access to millions of packages via npm (Node Package Manager). Your package.json lists which ones you're using.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <h4>Event Loop</h4>
+      <p>Node uses an event-driven model — it continuously listens for events (HTTP requests, file reads) and responds to them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── EXPRESS ─── -->
+<section id="stack">
+  <div class="section-label">// 03 — FRAMEWORK</div>
+  <h2>Express.js — The Router</h2>
+  <p>Node alone is low-level — you'd have to manually handle every URL path and HTTP method. <strong>Express.js is the framework that makes this elegant and fast.</strong> You're using Express v5 (the latest major version).</p>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">app.js — Basic Express Setup</span>
+    </div>
+    <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>();
+
+<span class="cm">// Middleware — runs on every request</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>()); <span class="cm">// Parse JSON body</span>
+
+<span class="cm">// A route — responds to GET /hello</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/hello'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>({ <span class="obj">message</span>: <span class="str">'Hello World!'</span> });
+});
+
+<span class="cm">// Start server on port 5000</span>
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="num">5000</span>, () => <span class="fn">console</span>.<span class="fn">log</span>(<span class="str">'Server running!'</span>));</pre>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <h4>Routing</h4>
+      <p>Map URLs to handler functions. <code style="color:var(--accent2);font-size:12px;">GET /api/items</code> → fetch items function.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <h4>Middleware</h4>
+      <p>Functions that run between request and response — for auth checks, logging, body parsing, etc.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📂</div>
+      <h4>Router Module</h4>
+      <p>Express Router lets you split routes into separate files (your <code style="color:var(--accent2);font-size:12px;">routes/</code> folder).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MONGODB + MONGOOSE ─── -->
+<section id="database">
+  <div class="section-label">// 04 — DATABASE</div>
+  <h2>MongoDB + Mongoose</h2>
+  
+  <h3>MongoDB Atlas — The Database</h3>
+  <p>MongoDB is a <strong>NoSQL database</strong> — it stores data not in rows/columns like Excel, but as <strong>JSON-like documents</strong>. Atlas is MongoDB's cloud version — no need to install MongoDB locally, it runs in the cloud and you connect via a URL.</p>
+  <div class="callout green">
+    <span class="icon">🌐</span>
+    <div><strong>Your setup:</strong> MongoDB Atlas stores your data in the cloud. You connect to it using a connection string in your <code style="color:var(--accent3);">.env</code> file — something like <code style="color:var(--accent3);">mongodb+srv://username:password@cluster.mongodb.net/dbname</code></div>
+  </div>
+
+  <h3>Mongoose — The Schema Layer</h3>
+  <p>MongoDB alone is flexible (any document shape). <strong>Mongoose adds structure</strong> — you define a Schema that says "every document in this collection must have these fields with these types."</p>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">models/ai-generated.js — Your Actual Schema</span>
+    </div>
+    <pre><span class="kw">const</span> <span class="var">mongoose</span> = <span class="fn">require</span>(<span class="str">'mongoose'</span>);
+
+<span class="kw">const</span> <span class="var">collectionSchema</span> = <span class="kw">new</span> <span class="var">mongoose</span>.<span class="fn">Schema</span>(
+  {
+    <span class="cm">// title field — must be a string, required</span>
+    <span class="obj">title</span>: {
+      <span class="obj">type</span>: <span class="fn">String</span>,
+      <span class="obj">required</span>: <span class="kw">true</span>,
+    },
+    <span class="cm">// subtitle — optional string</span>
+    <span class="obj">subtitle</span>: {
+      <span class="obj">type</span>: <span class="fn">String</span>,
+    },
+    <span class="cm">// image — stores image URL/path as string</span>
+    <span class="obj">image</span>: {
+      <span class="obj">type</span>: <span class="fn">String</span>,
+      <span class="obj">required</span>: <span class="kw">true</span>,
+    },
+  },
+  { <span class="obj">timestamps</span>: <span class="kw">true</span> } <span class="cm">// auto adds createdAt & updatedAt</span>
+);
+
+<span class="cm">// Export model named "ai-generated"</span>
+<span class="var">module</span>.<span class="var">exports</span> = <span class="var">mongoose</span>.<span class="fn">model</span>(<span class="str">'ai-generated'</span>, <span class="var">collectionSchema</span>);</pre>
+  </div>
+  <div class="callout">
+    <span class="icon">📌</span>
+    <div><strong>timestamps: true</strong> automatically adds <code style="color:var(--accent2);">createdAt</code> and <code style="color:var(--accent2);">updatedAt</code> fields to every document — super useful for sorting by newest.</div>
+  </div>
+</section>
+
+<!-- ─── DEPENDENCIES ─── -->
+<section id="deps">
+  <div class="section-label">// 05 — DEPENDENCIES</div>
+  <h2>Your package.json — Every Package Explained</h2>
+  <p>These are the packages listed in your <code style="color:var(--accent2);">package.json</code>. Each solves a specific problem.</p>
+  <table class="dep-table">
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Version</th>
+        <th>Type</th>
+        <th>What It Does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="dep-name">express</span></td>
+        <td><span class="dep-version">^5.2.1</span></td>
+        <td><span style="color:var(--accent);font-size:12px;">production</span></td>
+        <td class="dep-desc">The web framework — handles routing, middleware, HTTP requests/responses. The backbone of your server.</td>
+      </tr>
+      <tr>
+        <td><span class="dep-name">mongoose</span></td>
+        <td><span class="dep-version">^9.2.1</span></td>
+        <td><span style="color:var(--accent);font-size:12px;">production</span></td>
+        <td class="dep-desc">ODM (Object Document Mapper) for MongoDB — defines schemas, creates models, handles all DB queries with clean syntax.</td>
+      </tr>
+      <tr>
+        <td><span class="dep-name">cors</span></td>
+        <td><span class="dep-version">^2.8.6</span></td>
+        <td><span style="color:var(--accent);font-size:12px;">production</span></td>
+        <td class="dep-desc">Cross-Origin Resource Sharing — browsers block frontend (port 3000) from calling backend (port 5000) by default. CORS middleware lifts this restriction.</td>
+      </tr>
+      <tr>
+        <td><span class="dep-name">dotenv</span></td>
+        <td><span class="dep-version">^17.3.1</span></td>
+        <td><span style="color:var(--accent);font-size:12px;">production</span></td>
+        <td class="dep-desc">Loads variables from <code style="color:var(--accent2);">.env</code> file into <code style="color:var(--accent2);">process.env</code>. Keeps secrets (DB passwords, API keys) out of your source code.</td>
+      </tr>
+      <tr>
+        <td><span class="dep-name">multer</span></td>
+        <td><span class="dep-version">^2.0.2</span></td>
+        <td><span style="color:var(--accent);font-size:12px;">production</span></td>
+        <td class="dep-desc">Middleware for handling file uploads (<code>multipart/form-data</code>). Saves uploaded images/files to your <code style="color:var(--accent2);">uploads/</code> folder.</td>
+      </tr>
+      <tr>
+        <td><span class="dep-name">nodemon</span></td>
+        <td><span class="dep-version">^3.1.14</span></td>
+        <td><span style="color:var(--accent3);font-size:12px;">dev only</span></td>
+        <td class="dep-desc">Auto-restarts your server every time you save a file. Only needed during development — that's why it's in <code>devDependencies</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>CORS — Explained Simply</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">Using CORS in your app.js</span>
+    </div>
+    <pre><span class="kw">const</span> <span class="var">cors</span> = <span class="fn">require</span>(<span class="str">'cors'</span>);
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>();
+
+<span class="cm">// Allow ALL origins (open for development)</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="fn">cors</span>());
+
+<span class="cm">// OR — allow only specific frontend URL (production)</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="fn">cors</span>({ <span class="obj">origin</span>: <span class="str">'http://localhost:3000'</span> }));</pre>
+  </div>
+
+  <h3>dotenv — Keeping Secrets Safe</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">.env file (never commit this to GitHub!)</span>
+    </div>
+    <pre><span class="cm"># .env file</span>
+<span class="obj">PORT</span>=<span class="num">5000</span>
+<span class="obj">MONGO_URI</span>=<span class="str">mongodb+srv://user:password@cluster.mongodb.net/mydb</span>
+<span class="obj">JWT_SECRET</span>=<span class="str">mysecretkey123</span></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">server.js — reading .env variables</span>
+    </div>
+    <pre><span class="fn">require</span>(<span class="str">'dotenv'</span>).<span class="fn">config</span>(); <span class="cm">// Load .env at top of file</span>
+
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="var">env</span>.<span class="obj">PORT</span> || <span class="num">5000</span>;
+<span class="kw">const</span> <span class="var">MONGO_URI</span> = <span class="var">process</span>.<span class="var">env</span>.<span class="obj">MONGO_URI</span>;</pre>
+  </div>
+</section>
+
+<!-- ─── FOLDER STRUCTURE ─── -->
+<section id="folder">
+  <div class="section-label">// 06 — ARCHITECTURE</div>
+  <h2>Folder Structure Explained</h2>
+  <p>Looking at your project from the screenshot, here's what each folder and file does:</p>
+  <div class="tree">
+<span class="folder">📁 SumitSir-Pro-Backend/</span>
+<span class="folder">  📁 backend/</span>
+<span class="folder">    📁 src/</span>
+<span class="folder">      📁 config/</span>       <span class="note">← DB connection setup (mongoose.connect)</span>
+<span class="folder">      📁 controllers/</span>  <span class="note">← Business logic (what happens when route is hit)</span>
+<span class="folder">      📁 middleware/</span>   <span class="note">← Custom middleware (auth check, error handler)</span>
+<span class="folder">      📁 models/</span>       <span class="note">← Mongoose schemas (your ai-generated.js lives here)</span>
+<span class="folder">      📁 routes/</span>       <span class="note">← Express route definitions (GET, POST, PUT, DELETE)</span>
+<span class="file">    📄 app.js</span>          <span class="note">← Express app setup (middleware, routes registered)</span>
+<span class="file">    📄 server.js</span>       <span class="note">← Entry point (starts server, connects DB)</span>
+<span class="folder">    📁 uploads/</span>        <span class="note">← Where multer saves uploaded files</span>
+<span class="file">    📄 .env</span>            <span class="note">← Secret environment variables (DO NOT push to GitHub)</span>
+<span class="file">    📄 .gitignore</span>      <span class="note">← Tells git to ignore node_modules, .env</span>
+<span class="file">    📄 package.json</span>    <span class="note">← Project info + dependencies list</span>
+  </div>
+  <div class="callout">
+    <span class="icon">🏗️</span>
+    <div>This is the <strong>MVC pattern</strong> (Model-View-Controller). <strong>Models</strong> = database schemas, <strong>Controllers</strong> = logic functions, <strong>Routes</strong> = URL mappings. The View is handled by your frontend.</div>
+  </div>
+</section>
+
+<!-- ─── REQUEST FLOW ─── -->
+<section id="flow">
+  <div class="section-label">// 07 — REQUEST LIFECYCLE</div>
+  <h2>How a Request Flows Through Your Backend</h2>
+  <p>When a user submits a form or clicks a button, this is exactly what happens:</p>
+  <div class="flow">
+    <div class="flow-node"><span class="icon">🖥️</span><span>Frontend<br>React/HTML</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">🌐</span><span>HTTP<br>Request</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">🔗</span><span>CORS +<br>Middleware</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">🗺️</span><span>Express<br>Router</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">⚙️</span><span>Controller<br>Function</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">🗄️</span><span>MongoDB<br>Atlas</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><span class="icon">📤</span><span>JSON<br>Response</span></div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Frontend sends HTTP Request</h4>
+        <p>e.g., <code style="color:var(--accent2);font-size:12px;">POST https://yourapi.com/api/generate</code> with JSON body <code style="color:var(--accent2);font-size:12px;">{ title: "AI Art", image: "..." }</code></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>CORS Middleware checks origin</h4>
+        <p>Is the request from an allowed domain? If yes, proceed. If no, block it with a CORS error.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>express.json() parses the body</h4>
+        <p>Converts the raw JSON string in the request body into a JavaScript object available as <code style="color:var(--accent2);font-size:12px;">req.body</code>.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Express Router matches the URL</h4>
+        <p>Finds which route handler matches <code style="color:var(--accent2);font-size:12px;">POST /api/generate</code> and calls the corresponding controller function.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Controller runs the logic</h4>
+        <p>Creates a new document using your Mongoose model: <code style="color:var(--accent2);font-size:12px;">const item = new AiGenerated(req.body); await item.save();</code></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4>Mongoose talks to MongoDB Atlas</h4>
+        <p>The <code style="color:var(--accent2);font-size:12px;">save()</code> call sends the data to your Atlas cluster in the cloud and returns the saved document.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <h4>Response sent back to frontend</h4>
+        <p><code style="color:var(--accent2);font-size:12px;">res.status(201).json({ success: true, data: item })</code> — frontend receives this JSON and updates the UI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SETUP COMMANDS ─── -->
+<section id="setup">
+  <div class="section-label">// 08 — COMMANDS REFERENCE</div>
+  <h2>Setup Commands — Start to Finish</h2>
+  <p>Scratch se project shuru karna ho toh — ye sare commands order mein:</p>
+  
+  <h3>1. Folder & Project Init</h3>
+  <div class="cmd">mkdir my-backend && cd my-backend</div>
+  <div class="cmd">npm init -y</div>
+  
+  <h3>2. Install All Dependencies</h3>
+  <div class="cmd">npm install express mongoose cors dotenv multer</div>
+  <div class="cmd">npm install -D nodemon</div>
+
+  <h3>3. package.json Scripts Add Karo</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">package.json</span>
+    </div>
+    <pre>{
+  <span class="str">"scripts"</span>: {
+    <span class="str">"dev"</span>: <span class="str">"nodemon server.js"</span>,   <span class="cm">// Development: auto-restart</span>
+    <span class="str">"start"</span>: <span class="str">"node server.js"</span>     <span class="cm">// Production: plain node</span>
+  },
+  <span class="str">"type"</span>: <span class="str">"commonjs"</span>            <span class="cm">// Use require() syntax</span>
+}</pre>
+  </div>
+
+  <h3>4. Folder Structure Banao</h3>
+  <div class="cmd">mkdir src src/config src/controllers src/middleware src/models src/routes uploads</div>
+
+  <h3>5. .gitignore Banao</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">.gitignore</span>
+    </div>
+    <pre>node_modules/
+.env
+uploads/</pre>
+  </div>
+
+  <h3>6. Server Run Karo</h3>
+  <div class="cmd">npm run dev</div>
+  <div class="callout blue">
+    <span class="icon">🚀</span>
+    <div><strong>npm run dev</strong> uses nodemon (auto-restart on save). <strong>npm start</strong> uses plain node (no auto-restart — for deployment).</div>
+  </div>
+</section>
+
+<!-- ─── MULTER FILE UPLOAD ─── -->
+<section>
+  <div class="section-label">// 09 — FILE UPLOADS</div>
+  <h2>Multer — Handling File Uploads</h2>
+  <p>Your project has an <code style="color:var(--accent2);">uploads/</code> folder, which means you're using Multer to handle image/file uploads. Here's how it works:</p>
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+      <span class="code-lang">middleware/upload.js — Multer Config</span>
+    </div>
+    <pre><span class="kw">const</span> <span class="var">multer</span> = <span class="fn">require</span>(<span class="str">'multer'</span>);
+<span class="kw">const</span> <span class="var">path</span> = <span class="fn">require</span>(<span class="str">'path'</span>);
+
+<span class="cm">// Where to save files and what to name them</span>
+<span class="kw">const</span> <span class="var">storage</span> = <span class="var">multer</span>.<span class="fn">diskStorage</span>({
+  <span class="fn">destination</span>: (<span class="var">req</span>, <span class="var">file</span>, <span class="var">cb</span>) => {
+    <span class="fn">cb</span>(<span class="kw">null</span>, <span class="str">'uploads/'</span>); <span class="cm">// Save to uploads folder</span>
+  },
+  <span class="fn">filename</span>: (<span class="var">req</span>, <span class="var">file</span>, <span class="var">cb</span>) => {
+    <span class="cm">// Unique name: timestamp + original name</span>
+    <span class="fn">cb</span>(<span class="kw">null</span>, <span class="var">Date</span>.<span class="fn">now</span>() + <span class="str">'-'</span> + <span class="var">file</span>.<span class="var">originalname</span>);
+  }
+});
+
+<span class="kw">const</span> <span class="var">upload</span> = <span class="fn">multer</span>({ <span class="obj">storage</span> });
+<span class="var">module</span>.<span class="var">exports</span> = <span class="var">upload</span>; <span class="cm">// Export to use in routes</span></pre>
+  </div>
+</section>
+
+<!-- ─── SUMMARY ─── -->
+<section id="summary">
+  <div class="section-label">// ⭐ FINAL — REVISION SUMMARY</div>
+  <h2>One-Page Review Summary</h2>
+  <p>Jab bhi revision karo, bas ye section padh lo — sab kuch cover ho jaata hai:</p>
+
+  <div class="summary-box">
+    <h2>🎯 Your Backend Stack at a Glance</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <h5>🟢 Node.js</h5>
+        <p>JavaScript runtime — JS ko browser ke bahar run karta hai. V8 engine use karta hai. Backend ka base hai.</p>
+      </div>
+      <div class="summary-item y">
+        <h5>🟡 Express v5</h5>
+        <p>Web framework — routes, middleware, HTTP handling easy karta hai. app.get(), app.post(), app.use() — sab Express se aata hai.</p>
+      </div>
+      <div class="summary-item g">
+        <h5>🔵 MongoDB Atlas</h5>
+        <p>Cloud NoSQL database — JSON documents store karta hai. Atlas cloud version hai, koi local install nahi chahiye.</p>
+      </div>
+      <div class="summary-item">
+        <h5>🟣 Mongoose</h5>
+        <p>MongoDB ka ODM — Schema define karo, Model banao, phir .save(), .find(), .findById() use karo database operations ke liye.</p>
+      </div>
+      <div class="summary-item r">
+        <h5>🔴 CORS</h5>
+        <p>Frontend (localhost:3000) se backend (localhost:5000) ko call karne ki permission deta hai. Bina iske browser block kar deta hai.</p>
+      </div>
+      <div class="summary-item y">
+        <h5>🟡 dotenv</h5>
+        <p>.env file se secrets load karta hai. MongoDB URI, JWT secrets, ports — sab .env mein rakho, code mein hardcode mat karo.</p>
+      </div>
+      <div class="summary-item g">
+        <h5>🟢 Multer</h5>
+        <p>File upload middleware — images aur files ko uploads/ folder mein save karta hai. multipart/form-data handle karta hai.</p>
+      </div>
+      <div class="summary-item">
+        <h5>⚡ nodemon (dev)</h5>
+        <p>Development tool — file save karte hi server auto-restart ho jaata hai. Sirf devDependencies mein — production mein use nahi hota.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:28px; padding-top:24px; border-top: 1px solid rgba(124,106,247,0.2);">
+      <h3 style="color: var(--accent3); font-family:'Syne',sans-serif; font-size:16px; margin-bottom:14px;">📋 Quick Request Flow (Yaad karo)</h3>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:13px; color: var(--text); line-height:2.2;">
+        <span style="color:var(--blue)">Frontend</span> → <span style="color:var(--muted)">HTTP Request</span> → <span style="color:var(--accent2)">CORS Check</span> → <span style="color:var(--accent2)">Express Router</span> → <span style="color:var(--green)">Controller</span> → <span style="color:var(--green)">Mongoose Model</span> → <span style="color:var(--accent3)">MongoDB Atlas</span> → <span style="color:var(--blue)">JSON Response</span>
+      </p>
+      
+      <h3 style="color: var(--accent3); font-family:'Syne',sans-serif; font-size:16px; margin:20px 0 14px;">📁 Folder Purpose (Yaad karo)</h3>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--muted); line-height:2.4;">
+        <span style="color:var(--accent2)">models/</span> → Mongoose Schemas (data ka structure)<br>
+        <span style="color:var(--accent2)">routes/</span> → URL paths define (kaunsi URL, kaunsa function)<br>
+        <span style="color:var(--accent2)">controllers/</span> → Business logic (actually kya karna hai)<br>
+        <span style="color:var(--accent2)">middleware/</span> → Request interceptors (auth, upload, error)<br>
+        <span style="color:var(--accent2)">config/</span> → Database connection setup<br>
+        <span style="color:var(--accent2)">uploads/</span> → Multer dwara save ki gayi files<br>
+        <span style="color:var(--accent2)">.env</span> → Secrets (MongoDB URI, PORT) — never push to GitHub!
+      </p>
+
+      <h3 style="color: var(--accent3); font-family:'Syne',sans-serif; font-size:16px; margin:20px 0 14px;">⚡ Install Commands (Scratch se)</h3>
+      <p style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--green); line-height:2.3; background:rgba(0,0,0,0.4); padding:16px; border-radius:8px;">
+        $ npm init -y<br>
+        $ npm install express mongoose cors dotenv multer<br>
+        $ npm install -D nodemon<br>
+        $ npm run dev
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Built for SumitSir Pro Backend · Revision Guide · Node.js + Express + MongoDB
+</footer>
+
+<script>
+// Fade-in sections on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.07 });
+
+document.querySelectorAll('section').forEach(s => {
+  s.style.opacity = '0';
+  s.style.transform = 'translateY(24px)';
+  s.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+  observer.observe(s);
+});
+</script>
+</body>
+</html>
